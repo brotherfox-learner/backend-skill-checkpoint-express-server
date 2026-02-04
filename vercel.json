@@ -1,18 +1,21 @@
 {
-    "version": 2,
-    "builds": [
-      {
-        "src": "src/app.mjs",
-        "use": "@vercel/node"
-      }
-    ],
-    "routes": [
-      {
-        "src": "/(.*)",
-        "dest": "src/app.mjs"
-      }
-    ],
-    "redirects": [
-    { "source": "/", "destination": "/home", "permanent": false }
+  "version": 2,
+  "builds": [
+    {
+      "src": "app.mjs",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "app.mjs"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/home"
+    }
   ]
-  }
+}
