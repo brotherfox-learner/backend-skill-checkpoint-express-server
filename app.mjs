@@ -1,5 +1,5 @@
 import express from "express";
-// import cors from "cors";
+import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import dotenv from "dotenv";
@@ -25,6 +25,9 @@ const port = 4000;
 app.use(morgan("dev", {
   stream: { write: (msg) => console.log(msg.trimEnd()) }
 }));
+
+// CORS - อนุญาตทุก origin
+app.use(cors());
 
 // Helmet with CSP disabled for Swagger UI
 app.use(helmet({
