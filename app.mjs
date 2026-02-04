@@ -40,6 +40,12 @@ app.use(express.urlencoded({ extended: true }));
 
 // Swagger UI via CDN - สำหรับ Vercel serverless
 app.get("/api-docs", (req, res) => {
+  // Detect if running on Vercel or localhost
+  const isVercel = process.env.VERCEL === "1" || req.hostname.includes("vercel.app");
+  const defaultServer = isVercel 
+    ? "https://backend-skill-checkpoint-express-server-p3u4969i6.vercel.app"
+    : "http://localhost:4000";
+  
   res.setHeader("Content-Type", "text/html");
   res.send(`
 <!DOCTYPE html>
@@ -56,8 +62,21 @@ app.get("/api-docs", (req, res) => {
   <script src="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-standalone-preset.js"></script>
   <script>
     window.onload = () => {
+      const spec = ${JSON.stringify(swaggerDocument)};
+      
+      // Set default server based on environment
+      const defaultServer = "${defaultServer}";
+      if (spec.servers && spec.servers.length > 0) {
+        // Find and set the matching server as selected
+        spec.servers.forEach((server, index) => {
+          if (server.url === defaultServer) {
+            spec.servers[index].selected = true;
+          }
+        });
+      }
+      
       window.ui = SwaggerUIBundle({
-        spec: ${JSON.stringify(swaggerDocument)},
+        spec: spec,
         dom_id: '#swagger-ui',
         presets: [
           SwaggerUIBundle.presets.apis,
@@ -143,25 +162,6 @@ app.get("/home", (req, res) => {
 // Test route
 app.get("/test", (req, res) => {
   return res.json("Server API is working 🚀");
-});
-
-// Test database connection
-app.get("/test-db", async (req, res) => {
-  try {
-    const { default: pool } = await import("./utils/db.mjs");
-    const result = await pool.query("SELECT NOW()");
-    return res.json({ 
-      status: "Database connected!", 
-      time: result.rows[0].now,
-      connectionString: process.env.CONNECTION_STRING ? "SET" : "NOT SET"
-    });
-  } catch (error) {
-    return res.status(500).json({ 
-      status: "Database connection failed!",
-      error: error.message,
-      connectionString: process.env.CONNECTION_STRING ? "SET" : "NOT SET"
-    });
-  }
 });
 
 app.use("", router);
