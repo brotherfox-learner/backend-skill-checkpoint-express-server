@@ -22,10 +22,20 @@ const swaggerDocument = JSON.parse(
 const app = express();
 const port = 4000;
 
+//Middleware
+app.use(morgan("dev", {
+  stream: { write: (msg) => console.log(msg.trimEnd()) }
+}));
+
+// Helmet with CSP disabled for Swagger UI
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false
+}));
+
 // Swagger UI setup for Vercel compatibility
 const swaggerUiOptions = {
   customSiteTitle: "Skill Checkpoint API Documentation",
-  customfavIcon: false,
   swaggerOptions: {
     persistAuthorization: true,
     displayRequestDuration: true,
@@ -38,20 +48,13 @@ const swaggerUiOptions = {
 };
 
 // Swagger UI routes - สำหรับ Vercel serverless
-app.use("/api-docs", swaggerUi.serve);
-app.get("/api-docs", swaggerUi.setup(swaggerDocument, swaggerUiOptions));
-
-//Middleware
-app.use(morgan("dev", {
-  stream: { write: (msg) => console.log(msg.trimEnd()) }
-}));
-app.use(helmet());
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument, swaggerUiOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Test route
+// Root route - redirect to /home
 app.get("/", (req, res) => {
-  return res.json("Server API is working 🚀");
+  res.redirect("/home");
 });
 
 // Home route
