@@ -4,7 +4,6 @@ import helmet from "helmet";
 import morgan from "morgan";
 import dotenv from "dotenv";
 import router from "./routes/index.js";
-import swaggerUi from "swagger-ui-express";
 import { readFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
@@ -33,24 +32,54 @@ app.use(helmet({
   crossOriginEmbedderPolicy: false
 }));
 
-// Swagger UI setup for Vercel compatibility
-const swaggerUiOptions = {
-  customSiteTitle: "Skill Checkpoint API Documentation",
-  swaggerOptions: {
-    persistAuthorization: true,
-    displayRequestDuration: true,
-    filter: true,
-    tryItOutEnabled: true,
-    docExpansion: "list",
-    defaultModelsExpandDepth: 2,
-    defaultModelExpandDepth: 2
-  }
-};
-
-// Swagger UI routes - สำหรับ Vercel serverless
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument, swaggerUiOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Swagger UI via CDN - สำหรับ Vercel serverless
+app.get("/api-docs", (req, res) => {
+  res.setHeader("Content-Type", "text/html");
+  res.send(`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skill Checkpoint API Documentation</title>
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui.css" />
+</head>
+<body>
+  <div id="swagger-ui"></div>
+  <script src="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-bundle.js"></script>
+  <script src="https://unpkg.com/swagger-ui-dist@5.11.0/swagger-ui-standalone-preset.js"></script>
+  <script>
+    window.onload = () => {
+      window.ui = SwaggerUIBundle({
+        spec: ${JSON.stringify(swaggerDocument)},
+        dom_id: '#swagger-ui',
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIStandalonePreset
+        ],
+        layout: "StandaloneLayout",
+        persistAuthorization: true,
+        displayRequestDuration: true,
+        filter: true,
+        tryItOutEnabled: true,
+        docExpansion: "list",
+        defaultModelsExpandDepth: 2,
+        defaultModelExpandDepth: 2
+      });
+    };
+  </script>
+</body>
+</html>
+  `);
+});
+
+// Swagger JSON endpoint
+app.get("/api-docs/swagger.json", (req, res) => {
+  res.json(swaggerDocument);
+});
 
 // Root route - redirect to /home
 app.get("/", (req, res) => {

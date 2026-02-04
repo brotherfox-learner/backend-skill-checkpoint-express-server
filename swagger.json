@@ -14,7 +14,7 @@
       "description": "Local Development Server"
     },
     {
-      "url": "https://backend-skill-checkpoint-express-se-ten.vercel.app/",
+      "url": "https://backend-skill-checkpoint-express-se-ten.vercel.app",
       "description": "Vercel Production Server"
     }
   ],
