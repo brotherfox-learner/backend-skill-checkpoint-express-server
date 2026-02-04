@@ -1,0 +1,810 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Skill Checkpoint API",
+    "version": "1.0.0",
+    "description": "RESTful API for managing questions and answers. This API allows users to create, read, update, delete, and search questions, as well as create and manage answers for each question.",
+    "contact": {
+      "name": "Nitithon"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:4000",
+      "description": "Local Development Server"
+    },
+    {
+      "url": "https://backend-skill-checkpoint-express-se-ten.vercel.app/",
+      "description": "Vercel Production Server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Questions",
+      "description": "Operations related to questions"
+    },
+    {
+      "name": "Answers",
+      "description": "Operations related to answers"
+    },
+    {
+      "name": "Health",
+      "description": "Health check endpoint"
+    }
+  ],
+  "paths": {
+    "/test": {
+      "get": {
+        "tags": ["Health"],
+        "summary": "Health check",
+        "description": "Check if the API server is running",
+        "responses": {
+          "200": {
+            "description": "Server is running",
+            "content": {
+              "application/json": {
+                "example": "Server API is working 🚀"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/questions": {
+      "get": {
+        "tags": ["Questions"],
+        "summary": "Get all questions",
+        "description": "Retrieve a list of all questions",
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved questions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionsResponse"
+                },
+                "example": {
+                  "data": [
+                    {
+                      "id": 1,
+                      "title": "What is Express.js?",
+                      "description": "I want to learn about Express.js",
+                      "category": "Software",
+                      "created_at": "2024-01-01T00:00:00.000Z"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Questions"],
+        "summary": "Create a new question",
+        "description": "Create a new question with title, description, and optional category",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateQuestionRequest"
+              },
+              "example": {
+                "title": "What is Express.js?",
+                "description": "I want to learn about Express.js framework",
+                "category": "Software"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Question created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateQuestionResponse"
+                },
+                "example": {
+                  "message": "Question created successfully",
+                  "question": {
+                    "id": 1,
+                    "title": "What is Express.js?",
+                    "description": "I want to learn about Express.js framework",
+                    "category": "Software",
+                    "created_at": "2024-01-01T00:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/questions/search": {
+      "get": {
+        "tags": ["Questions"],
+        "summary": "Search questions",
+        "description": "Search questions by title and/or category (case-insensitive, partial match)",
+        "parameters": [
+          {
+            "name": "title",
+            "in": "query",
+            "description": "Search by question title",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "express"
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "description": "Search by category",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Software"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved questions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionsResponse"
+                },
+                "example": {
+                  "data": [
+                    {
+                      "id": 1,
+                      "title": "What is Express.js?",
+                      "description": "I want to learn about Express.js",
+                      "category": "Software",
+                      "created_at": "2024-01-01T00:00:00.000Z"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/questions/{id}": {
+      "get": {
+        "tags": ["Questions"],
+        "summary": "Get question by ID",
+        "description": "Retrieve a specific question by its ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Question ID",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved question",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionResponse"
+                },
+                "example": {
+                  "data": {
+                    "id": 1,
+                    "title": "What is Express.js?",
+                    "description": "I want to learn about Express.js",
+                    "category": "Software",
+                    "created_at": "2024-01-01T00:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Question not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Questions"],
+        "summary": "Update a question",
+        "description": "Update the title, description, and/or category of a question",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Question ID",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateQuestionRequest"
+              },
+              "example": {
+                "title": "Updated Title",
+                "description": "Updated description",
+                "category": "Technology"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Question updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionResponse"
+                },
+                "example": {
+                  "data": {
+                    "id": 1,
+                    "title": "Updated Title",
+                    "description": "Updated description",
+                    "category": "Technology",
+                    "created_at": "2024-01-01T00:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Question not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Questions"],
+        "summary": "Delete a question",
+        "description": "Delete a question by ID. This will also delete all associated answers.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Question ID",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Question deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteQuestionResponse"
+                },
+                "example": {
+                  "message": "Question post has been deleted successfully."
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Question not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/questions/{questionId}/answers": {
+      "get": {
+        "tags": ["Answers"],
+        "summary": "Get all answers for a question",
+        "description": "Retrieve all answers for a specific question",
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "required": true,
+            "description": "Question ID",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved answers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnswersResponse"
+                },
+                "example": {
+                  "data": [
+                    {
+                      "id": 1,
+                      "question_id": 1,
+                      "content": "Express.js is a web application framework for Node.js",
+                      "created_at": "2024-01-01T00:00:00.000Z"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Answers"],
+        "summary": "Create an answer for a question",
+        "description": "Create a new answer for a specific question. Content must be between 1 and 300 characters.",
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "required": true,
+            "description": "Question ID",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAnswerRequest"
+              },
+              "example": {
+                "content": "Express.js is a web application framework for Node.js"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Answer created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateAnswerResponse"
+                },
+                "example": {
+                  "message": "Answer created successfully",
+                  "answer": {
+                    "id": 1,
+                    "question_id": 1,
+                    "content": "Express.js is a web application framework for Node.js",
+                    "created_at": "2024-01-01T00:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Question not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Answers"],
+        "summary": "Delete all answers for a question",
+        "description": "Delete all answers associated with a specific question",
+        "parameters": [
+          {
+            "name": "questionId",
+            "in": "path",
+            "required": true,
+            "description": "Question ID",
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "All answers deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteAnswersResponse"
+                },
+                "example": {
+                  "message": "All answers deleted successfully",
+                  "data": []
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Question": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Question ID",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "description": "Question title",
+            "example": "What is Express.js?"
+          },
+          "description": {
+            "type": "string",
+            "description": "Question description",
+            "example": "I want to learn about Express.js"
+          },
+          "category": {
+            "type": "string",
+            "nullable": true,
+            "description": "Question category (optional)",
+            "example": "Software"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp",
+            "example": "2024-01-01T00:00:00.000Z"
+          }
+        },
+        "required": ["id", "title", "description", "created_at"]
+      },
+      "Answer": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Answer ID",
+            "example": 1
+          },
+          "question_id": {
+            "type": "integer",
+            "description": "Associated question ID",
+            "example": 1
+          },
+          "content": {
+            "type": "string",
+            "maxLength": 300,
+            "description": "Answer content (max 300 characters)",
+            "example": "Express.js is a web application framework for Node.js"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp",
+            "example": "2024-01-01T00:00:00.000Z"
+          }
+        },
+        "required": ["id", "question_id", "content", "created_at"]
+      },
+      "CreateQuestionRequest": {
+        "type": "object",
+        "required": ["title", "description"],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Question title (required)",
+            "example": "What is Express.js?"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Question description (required)",
+            "example": "I want to learn about Express.js framework"
+          },
+          "category": {
+            "type": "string",
+            "nullable": true,
+            "description": "Question category (optional)",
+            "example": "Software"
+          }
+        }
+      },
+      "UpdateQuestionRequest": {
+        "type": "object",
+        "required": ["title", "description"],
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Question title",
+            "example": "Updated Title"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Question description",
+            "example": "Updated description"
+          },
+          "category": {
+            "type": "string",
+            "nullable": true,
+            "description": "Question category",
+            "example": "Technology"
+          }
+        }
+      },
+      "CreateAnswerRequest": {
+        "type": "object",
+        "required": ["content"],
+        "properties": {
+          "content": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300,
+            "description": "Answer content (required, 1-300 characters)",
+            "example": "Express.js is a web application framework for Node.js"
+          }
+        }
+      },
+      "QuestionsResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Question"
+            }
+          }
+        },
+        "required": ["data"]
+      },
+      "QuestionResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Question"
+          }
+        },
+        "required": ["data"]
+      },
+      "CreateQuestionResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Question created successfully"
+          },
+          "question": {
+            "$ref": "#/components/schemas/Question"
+          }
+        },
+        "required": ["message", "question"]
+      },
+      "DeleteQuestionResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Question post has been deleted successfully."
+          }
+        },
+        "required": ["message"]
+      },
+      "AnswersResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Answer"
+            }
+          }
+        },
+        "required": ["data"]
+      },
+      "CreateAnswerResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Answer created successfully"
+          },
+          "answer": {
+            "$ref": "#/components/schemas/Answer"
+          }
+        },
+        "required": ["message", "answer"]
+      },
+      "DeleteAnswersResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "All answers deleted successfully"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Answer"
+            }
+          }
+        },
+        "required": ["message", "data"]
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Error message",
+            "example": "Something went wrong!"
+          }
+        },
+        "required": ["message"]
+      }
+    }
+  }
+}

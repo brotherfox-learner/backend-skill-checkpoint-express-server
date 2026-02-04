@@ -4,11 +4,27 @@ import helmet from "helmet";
 import morgan from "morgan";
 import dotenv from "dotenv";
 import router from "./routes/index.js";
+import swaggerUi from "swagger-ui-express";
+import { readFileSync } from "fs";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
+
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Load swagger.json
+const swaggerDocument = JSON.parse(
+  readFileSync(join(__dirname, "./swagger.json"), "utf8")
+);
 
 const app = express();
 const port = 4000;
 
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
+//Middleware
 app.use(morgan("dev", {
   stream: { write: (msg) => console.log(msg.trimEnd()) }
 }));
@@ -17,12 +33,67 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Test route
+app.get("/", (req, res) => {
+  return res.json("Server API is working 🚀");
+});
+
+// Home route
+app.get("/home", (req, res) => {
+  res.setHeader("Content-Type", "text/html");
+  res.send(`
+    <!doctype html>
+    <html>
+      <head>
+        <meta charset="utf-8" />
+        <title>Q&A API Server</title>
+        <style>
+          body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont;
+            max-width: 800px;
+            margin: 60px auto;
+            padding: 0 20px;
+            line-height: 1.6;
+            background: #fafafa;
+          }
+          h1 { font-size: 2rem; }
+          .card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.05);
+          }
+          a {
+            display: inline-block;
+            margin-right: 14px;
+            margin-top: 12px;
+            text-decoration: none;
+            color: #2563eb;
+            font-weight: 500;
+          }
+        </style>
+      </head>
+      <body>
+        <h1>Question & Answer API Server</h1>
+        <div class="card">
+          <p>
+            RESTful API built with Express.js and PostgreSQL.
+          </p>
+          <p>
+            <a href="/api-docs">📘 Swagger API Docs</a>
+          </p>
+        </div>
+      </body>
+    </html>
+  `);
+});
+
+
+// Test route
 app.get("/test", (req, res) => {
   return res.json("Server API is working 🚀");
 });
 
 app.use("", router);
-
 
 // 404 handler
 app.use((req, res) => {
@@ -35,7 +106,7 @@ app.use((err, req, res, next) => {
 
   const message =
     err.message ||
-    (statusCode === 500 ? "Something went wrong!" : err.message);
+    (statusCode === 500 ? "Something went wrong!" : "Something went wrong!");
 
   if (process.env.NODE_ENV === "development") {
     return res.status(statusCode).json({
@@ -47,7 +118,6 @@ app.use((err, req, res, next) => {
 
   return res.status(statusCode).json({ message });
 });
-
 
 // Export for Vercel serverless
 export default app;
