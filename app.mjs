@@ -41,9 +41,9 @@ app.use(express.urlencoded({ extended: true }));
 // Swagger UI via CDN - สำหรับ Vercel serverless
 app.get("/api-docs", (req, res) => {
   // Detect if running on Vercel or localhost
-  const isVercel = process.env.VERCEL === "1" || req.hostname.includes("vercel.app");
+  const isVercel = process.env.VERCEL === 1 || req.hostname.includes("vercel.app");
   const defaultServer = isVercel 
-    ? "https://backend-skill-checkpoint-express-server-p3u4969i6.vercel.app"
+    ? "https://backend-skill-checkpoint-express-se-ten.vercel.app/"
     : "http://localhost:4000";
   
   res.setHeader("Content-Type", "text/html");
