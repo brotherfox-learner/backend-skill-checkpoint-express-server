@@ -7,7 +7,8 @@ export const getAllQuestions = async (req, res, next) => {
         const result = await questionService.getAllQuestions();
         return res.status(200).json({data: result});
     } catch (error) {
-        next(new AppError("Unable to fetch questions.", 500));
+        console.error("getAllQuestions error:", error);
+        next(new AppError(error.message || "Unable to fetch questions.", 500));
     }
 }
 

@@ -145,6 +145,25 @@ app.get("/test", (req, res) => {
   return res.json("Server API is working 🚀");
 });
 
+// Test database connection
+app.get("/test-db", async (req, res) => {
+  try {
+    const { default: pool } = await import("./utils/db.mjs");
+    const result = await pool.query("SELECT NOW()");
+    return res.json({ 
+      status: "Database connected!", 
+      time: result.rows[0].now,
+      connectionString: process.env.CONNECTION_STRING ? "SET" : "NOT SET"
+    });
+  } catch (error) {
+    return res.status(500).json({ 
+      status: "Database connection failed!",
+      error: error.message,
+      connectionString: process.env.CONNECTION_STRING ? "SET" : "NOT SET"
+    });
+  }
+});
+
 app.use("", router);
 
 // 404 handler
