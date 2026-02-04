@@ -22,7 +22,24 @@ const swaggerDocument = JSON.parse(
 const app = express();
 const port = 4000;
 
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+// Swagger UI setup for Vercel compatibility
+const swaggerUiOptions = {
+  customSiteTitle: "Skill Checkpoint API Documentation",
+  customfavIcon: false,
+  swaggerOptions: {
+    persistAuthorization: true,
+    displayRequestDuration: true,
+    filter: true,
+    tryItOutEnabled: true,
+    docExpansion: "list",
+    defaultModelsExpandDepth: 2,
+    defaultModelExpandDepth: 2
+  }
+};
+
+// Swagger UI routes - สำหรับ Vercel serverless
+app.use("/api-docs", swaggerUi.serve);
+app.get("/api-docs", swaggerUi.setup(swaggerDocument, swaggerUiOptions));
 
 //Middleware
 app.use(morgan("dev", {
