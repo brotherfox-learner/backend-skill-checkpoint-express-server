@@ -10,12 +10,12 @@
   },
   "servers": [
     {
-      "url": "http://localhost:4000",
-      "description": "Local Development Server"
-    },
-    {
       "url": "https://backend-skill-checkpoint-express-se-ten.vercel.app",
       "description": "Vercel Production Server"
+    },
+    {
+      "url": "http://localhost:4000",
+      "description": "Local Development Server"
     }
   ],
   "tags": [

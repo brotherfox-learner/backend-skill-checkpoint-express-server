@@ -2,6 +2,13 @@
 
 A RESTful API server built with Express.js and PostgreSQL for managing questions and answers. This application allows users to create, read, update, delete, and search questions, as well as create and manage answers for each question. This project was built as a backend practice to demonstrate RESTful API design, layered architecture, and database relationship handling.
 
+## 🌐 Live Demo (Deployed on Vercel)
+The API is deployed on Vercel and available for testing:
+
+- **Base URL:** https://backend-skill-checkpoint-express-se-ten.vercel.app/
+- **Swagger Documentation:** https://backend-skill-checkpoint-express-se-ten.vercel.app/api-docs
+
+
 ## 🚀 Features
 
 ### Question Management
@@ -18,7 +25,6 @@ A RESTful API server built with Express.js and PostgreSQL for managing questions
 - ✅ Answers are automatically deleted when their parent question is deleted
 
 ## 📋 Prerequisites
-
 Before running this project, make sure you have the following installed:
 
 - **Node.js** (v14 or higher)
@@ -49,7 +55,6 @@ Run the following script on SQL:
 https://gist.github.com/napatwongchr/811ef7071003602b94482b3d8c0f32e0
 
 ## 🏃 Running the Application
-
 Start the development server:
 ```bash
 npm start
@@ -58,7 +63,6 @@ npm start
 The server will run on `http://localhost:4000` by default.
 
 ## 📚 API Documentation
-
 This project includes interactive API documentation powered by Swagger UI. After starting the server, you can access the complete API documentation at:
 
 **Swagger UI:** `http://localhost:4000/api-docs`
@@ -126,7 +130,6 @@ backend-skill-checkpoint-express-server/
 ```
 
 ## 🏛️ Architecture
-
 This project follows a **layered architecture** pattern:
 
 1. **Routes Layer** (`routes/`): Defines API endpoints and HTTP methods
@@ -134,9 +137,9 @@ This project follows a **layered architecture** pattern:
 3. **Services Layer** (`services/`): Contains business logic
 4. **Repositories Layer** (`repositories/`): Handles database operations
 5. **Models/Schemas Layer** (`schemas/`): Defines data validation schemas
+6. **Middlewares Layer** (`middlewares/`): Handles request validation, error handling, and request preprocessing.
 
 ## 🔒 Error Handling
-
 The application uses a centralized error handling middleware. Errors are returned in the following format:
 
 ```json
@@ -148,7 +151,6 @@ The application uses a centralized error handling middleware. Errors are returne
 In development mode, additional error details including stack traces are included.
 
 ## 📦 Dependencies
-
 - **express**: Web framework for Node.js
 - **pg**: PostgreSQL client for Node.js
 - **zod**: Schema validation library
@@ -158,7 +160,6 @@ In development mode, additional error details including stack traces are include
 - **nodemon**: Development server with auto-reload
 
 ## 🧪 Testing
-
 The easiest way to test the API is through the **Swagger UI** interface:
 
 1. Start the server: `npm start`
@@ -176,7 +177,6 @@ Alternatively, you can use other API testing tools:
 - **Insomnia**
 
 ## 📝 Notes
-
 - When a question is deleted, all associated answers are automatically deleted (CASCADE delete)
 - Search functionality supports partial matching and is case-insensitive
 - Answer content is limited to 300 characters maximum
@@ -189,5 +189,4 @@ Alternatively, you can use other API testing tools:
 
 
 ## 📄 License
-
 ISC
