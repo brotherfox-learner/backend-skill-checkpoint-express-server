@@ -1,4 +1,5 @@
 import * as questionRepository from "../repositories/questionRepository.mjs";
+import * as answerRepository from "../repositories/answerRepository.mjs";
 import { AppError } from "../utils/AppError.js";
 
 // ดึงข้อมูล questions ทั้งหมด
@@ -11,7 +12,7 @@ export const getAllQuestions = async () => {
 export const getQuestionById = async (id) => {
 
     const result = await questionRepository.getQuestionById(id);
-    if(!result) {
+    if (!result) {
         throw new AppError("Question not found.", 404);
     }
     return result;
@@ -19,7 +20,7 @@ export const getQuestionById = async (id) => {
 
 // สร้าง question ใหม่
 export const createQuestion = async (questionData) => {
-    const {title, description, category} = questionData;
+    const { title, description, category } = questionData;
 
     const newQuestionData = {
         title: title.trim(),
@@ -33,7 +34,7 @@ export const createQuestion = async (questionData) => {
 // อัพเดตข้อมูลในตาราง questions ตาม id
 export const updateQuestion = async (id, questionData) => {
     const result = await questionRepository.updateQuestion(id, questionData);
-    if(!result) {
+    if (!result) {
         throw new AppError("Question not found.", 404);
     }
     return result;
@@ -41,8 +42,9 @@ export const updateQuestion = async (id, questionData) => {
 
 // ลบข้อมูลในตาราง questions ตาม id
 export const deleteQuestion = async (id) => {
+    await answerRepository.deleteAllAnswersByQuestionId(id);  // ลบคำตอบก่อน
     const result = await questionRepository.deleteQuestion(id);
-    if(!result) {
+    if (!result) {
         throw new AppError("Question not found.", 404);
     }
     return result;
@@ -51,7 +53,7 @@ export const deleteQuestion = async (id) => {
 //ค้นหา question ตาม title หรือ category
 export const searchQuestion = async (title, category) => {
     const result = await questionRepository.searchQuestion(title, category);
-    if(result.length === 0) {
+    if (result.length === 0) {
         throw new AppError("Question not found.", 404);
     }
     return result;
